@@ -67,3 +67,6 @@ class EventComments(models.Model):
         return self.comment_text[:50]
 
 
+class EventAdmin(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    event = models.OneToOneField(Event , on_delete=models.CASCADE)

@@ -96,3 +96,7 @@ class CarCompanyComments(models.Model):
     def __str__(self):
         return self.text[:50]
 
+
+class CarCompanyAdmin(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    carcompany = models.OneToOneField(CarCompany , on_delete=models.CASCADE)

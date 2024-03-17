@@ -54,3 +54,6 @@ class ResturantComments(models.Model):
         return self.comment_text[:50]
     
 
+class ResturantAdmin(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    resturant = models.OneToOneField(Resturant , on_delete=models.CASCADE)

@@ -93,3 +93,8 @@ class HotelComments(models.Model):
     def __str__(self):
         return self.comment_text[:50]
 
+
+
+class HotelAdmin(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    hotel = models.OneToOneField(Hotel , on_delete=models.CASCADE)

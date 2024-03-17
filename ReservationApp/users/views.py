@@ -103,9 +103,9 @@ class LogIn(APIView):
             if user.password == request.data['password']:
                 if not user.is_authenticated:
                     login(request , user)
-                    return Response('logged in successfuly' , status=status.HTTP_200_OK)
+                    return Response({'message': 'logged in successfuly', 'user_id': user.pk, 'user_type': user.user_type }, status=status.HTTP_200_OK)
                 else:
-                    return Response('user already loged in')
+                    return Response({'message': 'user already loged in', 'user_id': user.pk, 'user_type': user.user_type }, status=status.HTTP_200_OK)
             else:
                 return Response('password not correct' , status=status.HTTP_400_BAD_REQUEST)
         else:

@@ -5,6 +5,14 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+
+    TYPE = [
+        ('Customer' , 'Customer') , 
+        ('HotelAdmin' , 'HotelAdmin') , 
+        ('CarCompanyAdmin' , 'CarCompanyAdmin'),
+        ('EventAdmin' , 'EventAdmin'),
+        ('ResturantAdmin' , 'ResturantAdmin')]
+
     age = models.IntegerField(null=True)
     country = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -12,7 +20,7 @@ class User(AbstractUser):
     balance = models.IntegerField(null=True, blank=True, default=0)
     email_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to="user_profile_image" , null=True , blank=True)
-
+    user_type = models.CharField(max_length=50, choices=TYPE , default='Customer')
 
 
 
