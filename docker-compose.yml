@@ -1,0 +1,12 @@
+version: '3.0'
+
+services:
+  web:
+    container_name: my_app
+    build:
+      context: ./ReservationApp
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./ReservationApp:/app/
+    ports:
+      - 8000:8000
