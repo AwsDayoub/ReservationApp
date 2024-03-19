@@ -54,7 +54,7 @@ class Car(models.Model):
     reserved = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
 class CarImages(models.Model):
     car = models.ForeignKey(Car , on_delete=models.CASCADE)

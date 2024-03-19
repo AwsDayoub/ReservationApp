@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer , SendVerificationCodeSerializer , LoginSerializer , ResetPasswordSerializer
 from datetime import datetime , timedelta
 from .models import User
@@ -121,14 +123,17 @@ class LogOut(APIView):
 
 class EditUserInfo(APIView):
     serializer_class = UserSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated]
     def put(self , request):
-        try:
-            user = User.objects.get(username=request.data['username'])
+        user = User.objects.get(username=request.data['username'])
+        print(user)
+        if user:
             serializer = UserSerializer(user, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data , status=status.HTTP_200_OK)
-        except:
+        else:
             return Response("user not found" , status=status.HTTP_404_NOT_FOUND)
 
 
