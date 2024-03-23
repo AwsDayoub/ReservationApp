@@ -8,16 +8,16 @@ class CarCompanySerializer(serializers.ModelSerializer):
         model = CarCompany
         fields = ['id', 'name' , 'email' , 'phone' , 'country' , 'city' , 'main_image' , 'date_created' , 'sum_of_rates' , 'number_of_rates']
 
-class CarCompanyImagesSerializer(serializers.ModelSerializer):
+class CarCompanyImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(max_length=None , use_url=True)
     class Meta:
         model = CarCompanyImages
-        fields = ['car_company' , 'image']
+        fields = ['car_company', 'image']
 
 
 class CarCompanyWithImagesSerializer(serializers.ModelSerializer):
     main_image = serializers.ImageField(max_length=None , use_url=True)
-    images = CarCompanyImagesSerializer(many=True , read_only=True)
+    images = CarCompanyImageSerializer(many=True , read_only=True)
     class Meta:
         model = CarCompany
         fields = ['id' , 'name' , 'email' , 'phone' , 'country' , 'city' , 'main_image' , 'date_created' , 'sum_of_rates' , 'number_of_rates' , 'images']
@@ -46,17 +46,17 @@ class CarWithCarImagesSerializer(serializers.ModelSerializer):
 class CarReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarReservation
-        fields = ['id' , 'car_company_id' , 'car_id' , 'user_id' , 'start_date' , 'end_date' , 'pickup_location' , 'delivery_location' , 'description']
+        fields = ['car_company_id' , 'car_id' , 'user_id' , 'start_date' , 'end_date' , 'pickup_location' , 'delivery_location' , 'description']
 
 
-class CarReservationIdImageserializer(serializers.ModelSerializer):
+class CarReservationIdImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(max_length=None , use_url=True)
     class Meta:
         model = CarReservationIdImage
-        fields = '__all__'
+        fields = ['reservation_id' , 'image']
 
 class CarReservationWithIdImageSerializer(serializers.ModelSerializer):
-    images = CarReservationIdImageserializer(many=True , read_only=True)
+    images = CarReservationIdImageSerializer(many=True , read_only=True)
     class Meta:
         model = CarReservation
         fields = ['id' , 'car_company_id' , 'car_id' , 'user_id' , 'start_date' , 'end_date' , 'pickup_location' , 'delivery_location' , 'description' , 'images']
@@ -66,3 +66,4 @@ class CarCompanyCommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarCompanyComments
         fields = '__all__'
+

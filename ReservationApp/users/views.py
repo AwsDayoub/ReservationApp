@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status , generics
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer , SendVerificationCodeSerializer , LoginSerializer , ResetPasswordSerializer
@@ -148,3 +148,10 @@ class ResetPassword(APIView):
         user.save()
         return Response('success' , status=status.HTTP_200_OK)
     
+
+class DeleteUser(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, format=None):
+        user = request.user  
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

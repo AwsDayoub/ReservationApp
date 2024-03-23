@@ -12,7 +12,7 @@ class User(AbstractUser):
         ('CarCompanyAdmin' , 'CarCompanyAdmin'),
         ('EventAdmin' , 'EventAdmin'),
         ('ResturantAdmin' , 'ResturantAdmin')]
-
+    email = models.EmailField(unique=True)
     age = models.IntegerField(null=True)
     country = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -22,6 +22,8 @@ class User(AbstractUser):
     image = models.ImageField(upload_to="user_profile_image" , null=True , blank=True)
     user_type = models.CharField(max_length=50, choices=TYPE , default='Customer')
 
+    def __str__(self):
+        return str(self.pk)
 
 
 

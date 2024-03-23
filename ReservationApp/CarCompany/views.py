@@ -1,17 +1,18 @@
 from django.shortcuts import render , get_object_or_404
 from django.db.models import Q , F , Prefetch
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from .models import CarCompany , CarCompanyImages , Car , CarImages , CarReservation , CarReservationIdImage , CarCompanyComments
-from .serializer import CarCompanySerializer , CarCompanyWithImagesSerializer , CarWithCarImagesSerializer , CarReservationWithIdImageSerializer , CarCompanyCommentsSerializer
-from .paginations import CarCompanyListPagination
-from .permissions import IsManager
-from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from .permissions import IsManager
 from rest_framework import generics
+from rest_framework.parsers import MultiPartParser
+from drf_spectacular.utils import extend_schema
+from .models import *
+from .serializer import *
+from .paginations import CarCompanyListPagination
+from .permissions import IsManager
+
 
 # Create your views here.
 
@@ -60,7 +61,7 @@ class ShowCars(APIView):
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     def get(self , request , car_company_id):
-        cars = Car.objects.filter(car_company_id=car_company_id)
+        cars = Car.objects.filter(car_company_id=car_company_id , reserved=False)
         for car in cars:
             images = CarImages.objects.filter(car=car.pk)
             car.images = images
@@ -106,12 +107,85 @@ class ShowCarCompanyReservationsDetails(APIView):
         return Response(serializer.data , status=status.HTTP_200_OK)
 
 
-class ShowCarCompanyComments(APIView):
+class ShowCarCompanyComments(generics.ListAPIView):
     permission_classes = [IsAuthenticated , IsManager]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
     serializer_class = CarCompanyCommentsSerializer
+    def get_queryset(self):
+        car_company_id = self.kwargs.get('car_company_id')
+        return CarCompanyComments.objects.filter(car_company_id=car_company_id)
+ 
 
-    def get(self , request , car_company_id):
-        comments = CarCompanyComments.objects.filter(car_company_id=car_company_id)
-        serializer = self.serializer_class(comments , many=True)
-        return Response(serializer.data , status=status.HTTP_200_OK)
+class AddCarCompany(APIView):
+    serializer_class = CarCompanySerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated , IsManager]
+    throttle_classes = [AnonRateThrottle , UserRateThrottle]
+    def post(self , request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'object created, use the returned id to post images for it', 'id': serializer.data.get('id')}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class AddCarCompanyImage(generics.CreateAPIView):
+    serializer_class = CarCompanyImageSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated, IsManager]
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+
+class AddCar(generics.CreateAPIView):
+    serializer_class = CarSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated , IsManager]
+    throttle_classes = [AnonRateThrottle , UserRateThrottle]
+    def post(self , request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'object created, use the returned id to post images for it', 'id': serializer.data.get('id')}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AddCarImages(generics.CreateAPIView):
+    serializer_class = CarImagesSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated, IsManager]
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+
+
+
+class AddCarReservation(APIView):
+    serializer_class = CarReservationSerializer
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [AnonRateThrottle , UserRateThrottle]
+    def post(self, request , car_id):
+        car = Car.objects.get(id=car_id)
+        if request.user.balance < car.price:
+            return Response('not enouph balance' , status=status.HTTP_400_BAD_REQUEST)
+        elif car.reserved:
+            return Response('car already reserved', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'success, use the returned reservation id to add image of user credintials', 'reservation_id': serializer.data.get('id')}, status=status.HTTP_200_OK)
+            else:
+                return Response('not valid data', status=status.HTTP_400_BAD_REQUEST)
+            
+
+
+class AddCarReservationIDImage(generics.CreateAPIView):
+    serializer_class = CarReservationIdImageSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]  
+
+
+
+class AddCarCompanyComment(generics.CreateAPIView):
+    serializer_class = CarCompanyCommentsSerializer
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]     
