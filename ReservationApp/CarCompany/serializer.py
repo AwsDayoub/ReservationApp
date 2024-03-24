@@ -12,7 +12,7 @@ class CarCompanyImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(max_length=None , use_url=True)
     class Meta:
         model = CarCompanyImages
-        fields = ['car_company', 'image']
+        fields = ['id' , 'car_company', 'image']
 
 
 class CarCompanyWithImagesSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class CarImagesSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(max_length=None , use_url=True)
     class Meta:
         model = CarImages
-        fields = ['car' , 'image']
+        fields = ['id' , 'car' , 'image']
 
 
 class CarWithCarImagesSerializer(serializers.ModelSerializer):

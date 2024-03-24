@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework import generics
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema
 from .models import *
 from .serializer import *
@@ -188,4 +188,111 @@ class AddCarReservationIDImage(generics.CreateAPIView):
 class AddCarCompanyComment(generics.CreateAPIView):
     serializer_class = CarCompanyCommentsSerializer
     permission_classes = [IsAuthenticated]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]     
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]  
+
+
+
+class UpdateCarCompany(APIView):
+    serializer_class = CarCompanySerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated , IsManager]
+    def put(self , request):
+        try:
+            carcompany = CarCompany.objects.get(id=request.data['id'])
+        except CarCompany.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(carcompany, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateCar(APIView):
+    serializer_class = CarSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated , IsManager]
+    def put(self , request):
+        try:
+            car = Car.objects.get(id=request.data['id'])
+        except Car.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(car, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateComment(APIView):
+    serializer_class = CarCompanyCommentsSerializer
+    permission_classes = [IsAuthenticated]
+    def put(self , request):
+        try:
+            comment = CarCompanyComments.objects.get(id=request.data['id'])
+        except CarCompanyComments.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCarCompanyImage(APIView):
+    permission_classes = [IsAuthenticated , IsManager]
+    def delete(self , request , car_company_image_id):
+        try:
+            image = CarCompanyImages.objects.get(id=car_company_image_id)
+        except CarCompanyImages.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        image.delete()
+        return Response('success', status=status.HTTP_200_OK)
+
+
+class DeleteCarImage(APIView):
+    permission_classes = [IsAuthenticated , IsManager]
+    def delete(self , request , car_image_id):
+        try:
+            image = CarImages.objects.get(id=car_image_id)
+        except CarImages.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        image.delete()
+        return Response('success', status=status.HTTP_200_OK)
+
+
+
+class DeleteCarCompany(APIView):
+    permission_classes = [IsAuthenticated , IsManager]
+    def delete(self , request , car_company_id):
+        try:
+            carcompany = CarCompany.objects.get(id=car_company_id)
+        except CarCompany.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        carcompany.delete()
+        return Response('success', status=status.HTTP_200_OK)    
+    
+
+
+
+class DeleteCar(APIView):
+    permission_classes = [IsAuthenticated , IsManager]
+    def delete(self , request , car_id):
+        try:
+            car = Car.objects.get(id=car_id)
+        except Car.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        car.delete()
+        return Response('success', status=status.HTTP_200_OK) 
+
+
+class DeleteCarCompanyComment(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self , request , car_company_comment_id):
+        try:
+            carcompanycomment = CarCompanyComments.objects.get(id=car_company_comment_id)
+        except CarCompanyComments.DoesNotExist:
+            return Response('not valid id', status=status.HTTP_404_NOT_FOUND)
+        carcompanycomment.delete()
+        return Response('success', status=status.HTTP_200_OK) 
